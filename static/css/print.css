@@ -1,0 +1,60 @@
+/**
+ * Print Stylesheet: Used for @media print and standalone print preview.
+ */
+
+@media print {
+    body {
+        background: #fff !important;
+        color: #000 !important;
+        font-family: 'Noto Sans Sinhala', 'Noto Sans', sans-serif !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .topbar,
+    .left-pane,
+    .center-pane,
+    .split-handle,
+    .pane-view-header,
+    .editor-subpane,
+    .mcq-layout-chip-bar,
+    .diagram-meta-badge,
+    .toast-container,
+    .modal-backdrop,
+    .drawer-backdrop {
+        display: none !important;
+    }
+
+    .app-container,
+    .workspace-panes,
+    .right-pane,
+    .right-pane-body,
+    .preview-subpane {
+        display: block !important;
+        width: 100% !important;
+        height: auto !important;
+        overflow: visible !important;
+        background: transparent !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .preview-paper {
+        box-shadow: none !important;
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .pagebreak-divider {
+        page-break-after: always !important;
+        border: none !important;
+        visibility: hidden !important;
+    }
+
+    mark.flag-uncertain {
+        background: transparent !important;
+        color: inherit !important;
+        border: none !important;
+    }
+}

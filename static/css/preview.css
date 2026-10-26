@@ -1,0 +1,292 @@
+/**
+ * Preview Stylesheet: A4 Paper Typesetting & Dialect Elements
+ * Shared with browser print / PDF export preview.
+ */
+
+@font-face { font-family: 'Noto Sans Sinhala'; src: url('/static/fonts/NotoSansSinhala-Regular.ttf') format('truetype'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Noto Sans Sinhala'; src: url('/static/fonts/NotoSansSinhala-Bold.ttf') format('truetype'); font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Noto Sans'; src: url('/static/fonts/NotoSans-Regular.ttf') format('truetype'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Noto Sans'; src: url('/static/fonts/NotoSans-Bold.ttf') format('truetype'); font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Noto Sans'; src: url('/static/fonts/NotoSans-Italic.ttf') format('truetype'); font-style: italic; font-display: swap; }
+
+.preview-paper {
+    font-family: 'Noto Sans Sinhala', 'Noto Sans', sans-serif;
+    color: #1e293b;
+    line-height: 1.6;
+}
+
+/* Headings */
+.preview-paper h1,
+.preview-paper h2,
+.preview-paper h3,
+.preview-paper h4 {
+    color: #0f172a;
+    font-weight: 700;
+    margin-top: 1.4em;
+    margin-bottom: 0.6em;
+    line-height: 1.25;
+}
+
+.preview-paper h1 { font-size: 1.65rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; }
+.preview-paper h2 { font-size: 1.35rem; }
+.preview-paper h3 { font-size: 1.15rem; }
+
+/* Paragraphs & Spacing */
+.preview-paper p {
+    margin-bottom: 1em;
+}
+
+/* Underline */
+.preview-paper u {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+/* KaTeX Sinhala Math Support */
+.katex .text,
+.katex .mord.text {
+    font-family: 'Noto Sans Sinhala', 'Noto Sans', sans-serif !important;
+}
+
+.katex-display {
+    margin: 1.2em 0 !important;
+}
+
+/* Equation Error Highlighting */
+.katex-error {
+    color: #dc2626 !important;
+    background: #fef2f2;
+    padding: 2px 4px;
+    border-radius: 3px;
+    border: 1px dashed #ef4444;
+}
+
+.katex-error-highlight {
+    cursor: pointer;
+    transition: background 150ms ease;
+}
+
+.katex-error-highlight:hover {
+    background: #fee2e2;
+}
+
+/* Uncertain Flag [?word?] */
+mark.flag-uncertain {
+    background-color: #fef08a;
+    color: #854d0e;
+    padding: 1px 4px;
+    border-radius: 3px;
+    border-bottom: 2px dashed #eab308;
+    cursor: help;
+    font-weight: 500;
+}
+
+/* Tables (Pipe tables & MCQ) */
+.preview-paper table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.2em 0;
+    font-size: 0.95em;
+}
+
+.preview-paper th,
+.preview-paper td {
+    border: 1px solid #cbd5e1;
+    padding: 8px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+
+.preview-paper th {
+    background: #f8fafc;
+    font-weight: 600;
+}
+
+/* MCQ Preview Blocks */
+.mcq-preview-block {
+    position: relative;
+    margin: 1.4em 0;
+    padding: 4px;
+    border-radius: 6px;
+    transition: background 150ms ease;
+}
+
+.mcq-preview-block:hover {
+    background: rgba(241, 245, 249, 0.6);
+}
+
+/* Hide empty thead row in MCQ tables */
+.mcq-preview-block table thead {
+    display: none;
+}
+
+.mcq-preview-block table {
+    border: none !important;
+    margin: 4px 0 !important;
+}
+
+.mcq-preview-block td {
+    border: none !important;
+    padding: 6px 12px;
+}
+
+/* Floating Layout Chip Bar */
+.mcq-layout-chip-bar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 2px;
+    position: relative;
+}
+
+.mcq-layout-chip {
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 2px 10px;
+    font-size: 11px;
+    cursor: pointer;
+    color: #475569;
+    transition: all 150ms ease;
+}
+
+.mcq-layout-chip:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+    border-color: #94a3b8;
+}
+
+.mcq-layout-menu {
+    position: absolute;
+    right: 0;
+    top: 24px;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    display: none;
+    flex-direction: column;
+    z-index: 100;
+    min-width: 170px;
+    overflow: hidden;
+    padding: 4px 0;
+}
+
+.mcq-layout-menu.open {
+    display: flex;
+}
+
+.mcq-layout-menu-item {
+    padding: 7px 12px;
+    font-size: 12px;
+    color: #334155;
+    cursor: pointer;
+    transition: background 150ms ease;
+}
+
+.mcq-layout-menu-item:hover:not(.disabled) {
+    background: #f8fafc;
+    color: #0f172a;
+}
+
+.mcq-layout-menu-item.active {
+    font-weight: 700;
+    color: #2563eb;
+    background: #eff6ff;
+}
+
+.mcq-layout-menu-item.disabled {
+    color: #94a3b8;
+    cursor: not-allowed;
+    background: #f8fafc;
+}
+
+.mcq-layout-menu-divider {
+    height: 1px;
+    background: #e2e8f0;
+    margin: 4px 0;
+}
+
+.mcq-layout-menu-item.action-item {
+    font-weight: 600;
+    color: #475569;
+    font-size: 11px;
+}
+
+/* Diagrams */
+.preview-diagram-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 1.4em auto;
+    position: relative;
+}
+
+.preview-diagram-img {
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    cursor: context-menu;
+    transition: all 150ms ease;
+}
+
+.preview-diagram-img:hover {
+    border-color: #7c9cff;
+    box-shadow: 0 4px 12px rgba(124, 156, 255, 0.25);
+}
+
+.diagram-meta-badge {
+    margin-top: 6px;
+    font-size: 11px;
+    color: #64748b;
+    display: inline-flex;
+    gap: 6px;
+    font-weight: 500;
+}
+
+.diagram-missing-placeholder {
+    padding: 12px;
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px dashed #ef4444;
+    border-radius: 6px;
+    font-size: 12px;
+    text-align: center;
+    margin: 1em 0;
+}
+
+/* Callout Box / Blockquote (shaded box) */
+.preview-paper blockquote {
+    background: #f8fafc;
+    border-left: 4px solid #94a3b8;
+    margin: 1.2em 0;
+    padding: 10px 16px;
+    border-radius: 0 4px 4px 0;
+    color: #334155;
+    font-style: normal;
+}
+
+/* Page Break Divider */
+.pagebreak-divider {
+    border: 0;
+    border-top: 2px dashed #94a3b8;
+    margin: 32px 0;
+    position: relative;
+    overflow: visible;
+}
+
+.pagebreak-divider::after {
+    content: attr(data-title);
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ffffff;
+    padding: 0 10px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #94a3b8;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}

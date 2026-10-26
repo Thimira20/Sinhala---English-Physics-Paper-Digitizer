@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sinhala & English Physics Paper Digitizer</title>
+
+    <!-- Vendored CSS -->
+    <link rel="stylesheet" href="/static/vendor/easymde.min.css">
+    <link rel="stylesheet" href="/static/vendor/katex.min.css">
+
+    <!-- Application CSS -->
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/preview.css">
+    <link rel="stylesheet" href="/static/css/print.css" media="print">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button id="btn-projects-menu" class="btn btn-outline" title="Open or manage projects">
+                    <span>≡ Projects</span>
+                </button>
+                <div class="topbar-project-info">
+                    <span id="topbar-project-name" class="project-name-text">Loading Project...</span>
+                    <button id="btn-edit-proj-name" class="btn btn-ghost btn-icon" title="Rename project">✎</button>
+                </div>
+                <div class="divider-vertical"></div>
+                <input type="file" id="file-upload-input" multiple accept=".pdf,.png,.jpg,.jpeg,.webp" style="display: none;" />
+                <button id="btn-upload" class="btn btn-primary" title="Upload paper pages (PDF, JPG, PNG, WEBP)">
+                    <span>⬆ Upload</span>
+                </button>
+
+                <!-- Batch Run OCR Dropdown -->
+                <div style="position: relative;">
+                    <button id="btn-run-all" class="btn btn-outline" title="Trigger OCR on all pages">
+                        <span>▶ Run all ▾</span>
+                    </button>
+                    <div id="run-all-menu" class="dropdown-menu">
+                        <div class="dropdown-item run-all-option" data-mode="accurate">
+                            <strong>Accurate</strong> <small style="display:block; opacity: 0.7;" id="run-all-accurate-model"></small>
+                        </div>
+                        <div class="dropdown-item run-all-option" data-mode="draft">
+                            <strong>Draft</strong> <small style="display:block; opacity: 0.7;" id="run-all-draft-model"></small>
+                        </div>
+                        <div class="dropdown-divider" style="height: 1px; background: var(--border-color); margin: 4px 0;"></div>
+                        <div class="dropdown-item" id="btn-retry-failed">
+                            <strong>↻ Retry failed pages</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Page Navigation -->
+                <div style="display: flex; align-items: center; gap: 4px;">
+                    <button id="btn-prev-page" class="btn btn-ghost btn-icon" title="Previous page (Alt+Left)">◀</button>
+                    <span id="topbar-page-display" style="font-size: 0.82rem; font-weight: 600; min-width: 48px; text-align: center;">1 / 1</span>
+                    <button id="btn-next-page" class="btn btn-ghost btn-icon" title="Next page (Alt+Right)">▶</button>
+                </div>
+            </div>
+
+            <div class="topbar-right">
+                <span id="queue-status-pill" class="queue-pill" style="display: none;">Processing 0</span>
+
+                <span id="equation-errors-badge" class="equation-errors-badge" style="display: none; cursor: pointer; color: var(--error); font-size: 0.82rem; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: rgba(239, 68, 68, 0.1);" title="Click to jump to first equation error">✖ 0 equation errors</span>
+
+                <button id="btn-flags-nav" class="flags-nav-btn" style="display: none;" title="Jump to next uncertain reading (F8)">
+                    <span>⚠ <strong id="topbar-flags-count">0 flags</strong> ▸</span>
+                </button>
+
+                <div class="divider-vertical"></div>
+
+                <button id="btn-settings" class="btn btn-ghost btn-icon" title="Settings (API key, pricing, fonts, crop)">
+                    <span>⚙</span>
+                </button>
+                <button id="btn-export-docx" class="btn btn-outline" title="Export to Microsoft Word (.docx)">
+                    <span>Export Word</span>
+                </button>
+                <button id="btn-export-pdf" class="btn btn-outline" title="Export to PDF (.pdf)">
+                    <span>Export PDF</span>
+                </button>
+
+                <span id="save-status-badge" class="status-badge badge-saved">● Saved</span>
+                <span id="topbar-project-spend" class="spend-indicator">$0.00 this proj</span>
+            </div>
+        </header>
+
+        <!-- Dynamic Upload Progress Bar -->
+        <div id="upload-progress-bar" class="upload-progress" style="display: none; width: 0%;"></div>
+
+        <!-- 3-Pane Workspace -->
+        <main class="workspace-panes">
+            <!-- Left Pane: Page Strip -->
+            <aside class="left-pane" id="left-pane">
+                <div class="page-strip-content" id="page-strip">
+                    <!-- Populated dynamically by app.js -->
+                </div>
+            </aside>
+
+            <!-- Splitter 1 -->
+            <div class="split-handle" id="split-handle-1"></div>
+
+            <!-- Center Pane: Source Work Viewer -->
+            <section class="center-pane" id="center-pane">
+                <div class="viewer-container" id="viewer-container" style="display: flex; flex-direction: column; height: 100%;">
+                    <!-- Canvas & SVG populated by viewer.js -->
+                </div>
+            </section>
+
+            <!-- Splitter 2 -->
+            <div class="split-handle" id="split-handle-2"></div>
+
+            <!-- Right Pane: Split Editor & Live Preview -->
+            <section class="right-pane mode-split" id="right-pane">
+                <div class="pane-view-header">
+                    <span style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">EDITOR & PREVIEW</span>
+                    <div class="view-toggle-group">
+                        <button class="view-toggle-btn active" data-mode="split" title="Split Screen">Split</button>
+                        <button class="view-toggle-btn" data-mode="editor-only" title="Editor Only">Editor</button>
+                        <button class="view-toggle-btn" data-mode="preview-only" title="Preview Only">Preview</button>
+                    </div>
+                </div>
+
+                <div class="right-pane-body" id="right-pane-body">
+                    <!-- Editor Subpane -->
+                    <div class="editor-subpane" id="editor-subpane">
+                        <textarea id="editor-textarea" style="display: none;"></textarea>
+                    </div>
+
+                    <!-- Editor-Preview Splitter Handle -->
+                    <div class="split-handle" id="editor-preview-splitter" style="display: none;"></div>
+
+                    <!-- Preview Subpane -->
+                    <div class="preview-subpane" id="preview-subpane">
+                        <div class="preview-container" id="preview-container">
+                            <div class="preview-paper" id="preview-paper">
+                                <!-- Populated dynamically by preview.js -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Vendored Scripts -->
+    <script src="/static/vendor/easymde.min.js"></script>
+    <script src="/static/vendor/katex.min.js"></script>
+    <script src="/static/vendor/marked.min.js"></script>
+    <script src="/static/vendor/marked-katex-extension.umd.js"></script>
+    <script src="/static/vendor/purify.min.js"></script>
+
+    <!-- Main ES Modules Entry -->
+    <script type="module" src="/static/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MCQ & Dialect Round-Trip Tests (Phase 2)</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 40px; background: #0f1220; color: #f8fafc; }
+        .test-card { background: #171a2b; border: 1px solid #262a40; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+        .pass { color: #3ecf8e; font-weight: bold; }
+        .fail { color: #ff6b6b; font-weight: bold; }
+        pre { background: #101322; padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 13px; color: #93c5fd; }
+        h1 { color: #7c9cff; }
+        .summary-badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-weight: bold; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 MCQ Layout & Dialect Verification Suite</h1>
+    <div id="test-summary">Running test vectors...</div>
+    <div id="test-results"></div>
+
+    <script type="module">
+        import { parseOptions, emit, detectLayout, canUseGridLayout } from '/static/js/mcq.js?v=2';
+        import { protectMath, restoreMath, applyNumberingEscape, countUncertainFlags, stripUncertainFlags } from '/static/js/dialect.js?v=2';
+
+        async function runTests() {
+            const resultsEl = document.getElementById('test-results');
+            const summaryEl = document.getElementById('test-summary');
+            let passedCount = 0;
+            let failedCount = 0;
+
+            function assert(desc, condition, details = '') {
+                const card = document.createElement('div');
+                card.className = 'test-card';
+                if (condition) {
+                    passedCount++;
+                    card.innerHTML = `<span class="pass">✔ PASS:</span> ${desc}`;
+                } else {
+                    failedCount++;
+                    card.innerHTML = `<span class="fail">✖ FAIL:</span> ${desc}<br><pre>${details}</pre>`;
+                }
+                resultsEl.appendChild(card);
+            }
+
+            // Test 1: Numbering escape
+            const rawText = "01. First Question\n(a) Sub question\n(1) Sub option\n(i) Roman";
+            const escaped = applyNumberingEscape(rawText);
+            assert(
+                "Numbering escape rule escapes '01.', '(a)', '(1)', '(i)'",
+                escaped.includes("01\\.") && escaped.includes("\\(a)") && escaped.includes("\\(1)") && escaped.includes("\\(i)"),
+                escaped
+            );
+
+            // Test 2: Uncertain flag counting & stripping
+            const flagText = "ශක්ති [?සංස්ථිති?] නියමය අනුව [?ප්‍රවේගය?] සොයන්න.";
+            assert("countUncertainFlags returns 2", countUncertainFlags(flagText) === 2);
+            assert("stripUncertainFlags removes [? ?]", stripUncertainFlags(flagText) === "ශක්ති සංස්ථිති නියමය අනුව ප්‍රවේගය සොයන්න.");
+
+            // Test 3: Math protection
+            const mathSample = "භාගික දෝෂය = $\\frac{x}{y}$ සහ $$E = mc^2$$ වේ.";
+            const { protectedText, mathTokens } = protectMath(mathSample);
+            assert("protectMath extracts 2 tokens", mathTokens.length === 2);
+            const restored = restoreMath(protectedText, mathTokens);
+            assert("restoreMath restores exact original string", restored === mathSample, `Expected: ${mathSample}\nGot: ${restored}`);
+
+            // Test 4: MCQ Cases Round-Trip
+            const res = await fetch('/tests/js/mcq_cases.json?v=' + Date.now());
+
+            let mcqCases = [];
+            if (res.ok) {
+                mcqCases = await res.json();
+            } else {
+                mcqCases = [
+                    {
+                        name: "5 Physics Options",
+                        options: [
+                            { label: "(1)", content: "$2\\,\\text{m s}^{-1}$" },
+                            { label: "(2)", content: "$4\\,\\text{m s}^{-1}$" },
+                            { label: "(3)", content: "$6\\,\\text{m s}^{-1}$" },
+                            { label: "(4)", content: "$8\\,\\text{m s}^{-1}$" },
+                            { label: "(5)", content: "$10\\,\\text{m s}^{-1}$" }
+                        ],
+                        can_grid: true
+                    }
+                ];
+            }
+
+            const layouts = ['row5', 'grid32', 'grid2', 'list'];
+
+            for (const c of mcqCases) {
+                assert(`canUseGridLayout matches expected for "${c.name}"`, canUseGridLayout(c.options) === c.can_grid);
+
+                if (c.can_grid) {
+                    for (const layout of layouts) {
+                        const emitted = emit(c.options, layout);
+                        assert(`emit(${layout}) wraps in <!-- mcq --> for "${c.name}"`, emitted.includes('<!-- mcq -->') && emitted.includes('<!-- /mcq -->'));
+
+                        // Extract inner text
+                        const inner = emitted.replace(/<!--\s*\/?mcq\s*-->/gi, '').trim();
+                        const parsed = parseOptions(inner);
+
+                        const match = parsed.length === c.options.length &&
+                            parsed.every((p, i) => p.label === c.options[i].label && p.content === c.options[i].content);
+
+                        assert(`Round-trip ${layout} reproduces options for "${c.name}"`, match,
+                            `Expected: ${JSON.stringify(c.options)}\nGot: ${JSON.stringify(parsed)}`);
+                    }
+                } else {
+                    // Restrained to list
+                    const emitted = emit(c.options, 'list');
+                    const inner = emitted.replace(/<!--\s*\/?mcq\s*-->/gi, '').trim();
+                    const parsed = parseOptions(inner);
+                    assert(`List layout round-trip for long options "${c.name}"`, parsed.length === c.options.length);
+                }
+            }
+
+            summaryEl.innerHTML = `
+                <div class="summary-badge" style="background: ${failedCount === 0 ? '#3ecf8e22' : '#ff6b6b22'}; color: ${failedCount === 0 ? '#3ecf8e' : '#ff6b6b'};">
+                    ${failedCount === 0 ? `✔ ALL ${passedCount} TESTS PASSED` : `✖ ${failedCount} TESTS FAILED, ${passedCount} PASSED`}
+                </div>
+            `;
+        }
+
+        runTests();
+    </script>
+</body>
+</html>

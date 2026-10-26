@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <title>Print Preview - Sinhala & English Physics Paper Digitizer</title>
+    <link rel="stylesheet" href="/static/vendor/katex.min.css">
+    <link rel="stylesheet" href="/static/css/preview.css">
+    <link rel="stylesheet" href="/static/css/print.css">
+    <style>
+        body {
+            background: #f1f5f9;
+            margin: 0;
+            padding: 24px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .print-toolbar {
+            width: 210mm;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        @media print {
+            .print-toolbar { display: none !important; }
+            body { padding: 0 !important; background: transparent !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="print-toolbar">
+        <h3 id="print-title" style="margin: 0; font-family: sans-serif;">Physics Paper</h3>
+        <div>
+            <button onclick="window.print()" style="padding: 8px 16px; background: #2563eb; color: #fff; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">🖨 Print / Save as PDF</button>
+        </div>
+    </div>
+
+    <div id="print-content" class="preview-paper">
+        Loading document...
+    </div>
+
+    <script src="/static/vendor/katex.min.js"></script>
+    <script src="/static/vendor/marked.min.js"></script>
+    <script src="/static/vendor/marked-katex-extension.umd.js"></script>
+    <script src="/static/vendor/purify.min.js"></script>
+    <script type="module">
+        import { protectMath, restoreMath, applyNumberingEscape, stripUncertainFlags } from '/static/js/dialect.js';
+
+        async function loadPrintDoc() {
+            const pathParts = window.location.pathname.split('/');
+            const pid = pathParts[pathParts.length - 1];
+            if (!pid) return;
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const pagesParam = urlParams.get('pages');
+            const targetPageNums = pagesParam ? pagesParam.split(',').map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n)) : null;
+
+            try {
+                const res = await fetch(`/api/projects/${pid}`);
+                const project = await res.json();
+                document.getElementById('print-title').textContent = project.name;
+                document.title = `${project.name} - Print`;
+
+                // Configure marked
+                if (window.marked && window.markedKatex) {
+                    window.marked.use(window.markedKatex({ throwOnError: false, strict: 'ignore' }));
+                }
+
+                const pagesHtml = [];
+                for (const pIdx of project.page_order) {
+                    if (targetPageNums && !targetPageNums.includes(pIdx)) continue;
+                    const page = project.pages[String(pIdx)];
+                    if (!page || (!targetPageNums && !page.include_in_export) || !page.markdown) continue;
+
+                    let md = stripUncertainFlags(page.markdown);
+                    // Replace diagrams
+                    for (const d of (page.diagrams || [])) {
+                        md = md.replace(new RegExp(`\\{\\{DIAGRAM:${d.id}\\}\\}`, 'g'),
+                            `<div class="preview-diagram-wrapper"><img class="preview-diagram-img" src="/files/${project.id}/${d.file}" style="width: ${d.width_pct || 50}%;" alt="${d.label || d.id}" /></div>`);
+                    }
+
+                    const { protectedText, mathTokens } = protectMath(md);
+                    let processed = applyNumberingEscape(protectedText);
+                    processed = processed.replace(/^\s*<!--\s*pagebreak\s*-->\s*$/gmi, '<hr class="pagebreak-divider" />');
+                    processed = restoreMath(processed, mathTokens);
+
+                    let rendered = window.marked ? window.marked.parse(processed) : processed;
+                    pagesHtml.push(rendered);
+                    if (page.page_break_after) {
+                        pagesHtml.push('<hr class="pagebreak-divider" />');
+                    }
+                }
+
+                const clean = window.DOMPurify ? window.DOMPurify.sanitize(pagesHtml.join('\n'), {
+                    ADD_TAGS: ['mark', 'u', 'hr'],
+                    ADD_ATTR: ['style']
+                }) : pagesHtml.join('\n');
+
+                document.getElementById('print-content').innerHTML = clean;
+
+                if (urlParams.get('autoprint') === 'true') {
+                    setTimeout(() => window.print(), 500);
+                }
+            } catch (err) {
+                document.getElementById('print-content').innerHTML = `Failed to load document: ${err.message}`;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', loadPrintDoc);
+    </script>
+</body>
+</html>

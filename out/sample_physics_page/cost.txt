@@ -1,0 +1,9 @@
+Input File: sample_physics_page.pdf
+Total Pages: 1
+Model: gemini-3.5-flash-lite (draft)
+Execution Time: 1.77 seconds
+Input Tokens: 2609
+Output Tokens: 252
+Thinking Tokens: 0
+Total Cost USD: $0.00071
+Avg Cost Per Page: $0.00071

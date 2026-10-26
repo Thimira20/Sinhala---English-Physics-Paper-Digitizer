@@ -1,0 +1,25 @@
+# Environments
+.venv/
+env/
+venv/
+__pycache__/
+*.pyc
+
+# User configuration & secrets
+config.json
+
+# Workspace runtime data
+workspace/
+assets/reference.docx
+assets/reference.hash
+
+# Test user samples
+tests/samples/
+*.docx
+*.pdf
+
+# IDE & OS
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini

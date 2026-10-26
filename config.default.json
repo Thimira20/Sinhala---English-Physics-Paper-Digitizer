@@ -1,0 +1,53 @@
+{
+  "gemini_api_key": "",
+  "gemini_model": "gemini-3.8-flash",
+  "gemini_draft_model": "gemini-3.5-flash-lite",
+  "thinking_budget": 0,
+  "requests_per_minute": 60,
+  "max_concurrent_jobs": 4,
+  "pricing_usd_per_million_tokens": {
+    "gemini-3.5-flash": {
+      "input": 0.30,
+      "output": 2.50
+    },
+    "gemini-3.5-flash-lite": {
+      "input": 0.15,
+      "output": 1.25
+    },
+    "gemini-3.8-flash": {
+      "input": 0.30,
+      "output": 2.50
+    },
+    "gemini-3.1-pro-preview": {
+      "input": 1.25,
+      "output": 10.0
+    }
+  },
+  "monthly_budget_warning_usd": 10.0,
+  "send_max_long_edge_px": 2400,
+  "send_jpeg_quality": 90,
+  "default_top_crop_percent": 0.0,
+  "default_bottom_crop_percent": 6.5,
+  "auto_deskew": false,
+  "sinhala_font": "Noto Sans Sinhala",
+  "sinhala_fallback_font": "Iskoola Pota",
+  "latin_font": "Noto Sans",
+  "body_font_size_pt": 11,
+  "line_spacing": 1.15,
+  "embed_fonts_in_docx": true,
+  "sinhala_math_mode": "omml",
+  "mcq_default_layout": "as_original",
+  "diagram_clean_mode": "normalize",
+  "pdf_engine_order": [
+    "word",
+    "libreoffice",
+    "browser"
+  ],
+  "branding_blacklist": [
+    "Samitha Ratnayake",
+    "Innovative Physics"
+  ],
+  "scrub_phone_numbers": true,
+  "scrub_urls_emails": true,
+  "server_port": 8000
+}

@@ -1,0 +1,9 @@
+Input File: 2026_AL_Physics_Mcq_paper_2pages.pdf
+Total Pages: 2
+Model: gemini-3.8-flash (accurate)
+Execution Time: 548.68 seconds
+Input Tokens: 5218
+Output Tokens: 2860
+Thinking Tokens: 8652
+Total Cost USD: $0.03035
+Avg Cost Per Page: $0.01517

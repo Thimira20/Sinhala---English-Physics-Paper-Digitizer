@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Standard 5 physics options with units",
+    "options": [
+      { "label": "(1)", "content": "$2\\,\\text{m s}^{-1}$" },
+      { "label": "(2)", "content": "$4\\,\\text{m s}^{-1}$" },
+      { "label": "(3)", "content": "$6\\,\\text{m s}^{-1}$" },
+      { "label": "(4)", "content": "$8\\,\\text{m s}^{-1}$" },
+      { "label": "(5)", "content": "$10\\,\\text{m s}^{-1}$" }
+    ],
+    "can_grid": true
+  },
+  {
+    "name": "Sinhala descriptive options",
+    "options": [
+      { "label": "(1)", "content": "වැඩි වේ" },
+      { "label": "(2)", "content": "අඩු වේ" },
+      { "label": "(3)", "content": "නියතව පවතී" },
+      { "label": "(4)", "content": "මුලින් වැඩි වී පසුව අඩු වේ" },
+      { "label": "(5)", "content": "ශුන්‍ය වේ" }
+    ],
+    "can_grid": true
+  },
+  {
+    "name": "Long options requiring list layout only",
+    "options": [
+      { "label": "(1)", "content": "මෙම වස්තුව සිරස්ව ඉහළට චලනය වන විට එහි ත්වරණය නියතව පවතින අතර ප්‍රවේගය කාලය සමඟ ඒකාකාරව වැඩි වන බව පැහැදිලිවම නිරීක්ෂණය කළ හැකි අතර චලිත සමීකරණ සියල්ලම වලංගු වේ." },
+      { "label": "(2)", "content": "කාලය ගත වන විට ත්වරණය ශුන්‍ය වන තෙක් ක්‍රමයෙන් අඩු වන අතර ප්‍රවේගය අවසාන සීමාකාරී අගයකට ළඟා වන බව නිරීක්ෂණය කළ හැකි වුවද බල සමතුලිතතාවය මෙහිදී වෙනස් නොවේ." }
+    ],
+    "can_grid": false
+  }
+]

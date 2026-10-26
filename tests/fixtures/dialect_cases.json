@@ -1,0 +1,23 @@
+[
+  {
+    "description": "Uncertain flag extraction",
+    "input": "මෙම පද්ධතියේ [?ත්වරණය?] සොයන්න.",
+    "expected_count": 1,
+    "stripped": "මෙම පද්ධතියේ ත්වරණය සොයන්න."
+  },
+  {
+    "description": "Question numbering escape rule",
+    "input": "01. පළමු ප්‍රශ්නය\n(a) පළමු කොටස\n(1) පළමු උප කොටස\n(i) රෝම ඉලක්කම",
+    "expected_escaped": "01\\. පළමු ප්‍රශ්නය\n\\(a) පළමු කොටස\n\\(1) පළමු උප කොටස\n\\(i) රෝම ඉලක්කම"
+  },
+  {
+    "description": "Sinhala text inside LaTeX fraction",
+    "input": "$$\\text{භාගික දෝෂය} = \\frac{\\text{දෝෂය}}{\\text{පාඨාංකය}}$$",
+    "has_math": true
+  },
+  {
+    "description": "Diagram tag",
+    "input": "පහත පරිපථ සටහන බලන්න.\n\n{{DIAGRAM:d1}}\n\nවිභව අන්තරය ගණනය කරන්න.",
+    "diagram_id": "d1"
+  }
+]
